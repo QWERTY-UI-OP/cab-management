@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold">Driver Dashboard</h1>
+        <div id="bookingsList" class="mt-4"></div>
+    </div>
+    <script>
+        async function loadMyBookings() {
+            const response = await fetch('/my-bookings');
+            const bookings = await response.json();
+            const bookingsList = document.getElementById('bookingsList');
+            bookingsList.innerHTML = '';
+            bookings.forEach(booking => {
+                const bookingItem = document.createElement('div');
+                bookingItem.textContent = `Name: ${booking.name}, Pickup: ${booking.pickup_location}, Dropoff: ${booking.dropoff_location}`;
+                bookingsList.appendChild(bookingItem);
+            });
+        }
+
+        loadMyBookings();
+    </script>
+</body>
+</html>

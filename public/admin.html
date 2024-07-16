@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto">
+        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+        <h2 class="text-xl mt-4">Create Cab Driver</h2>
+        <form id="driverForm" class="mb-4">
+            <input type="text" id="name" placeholder="Driver Name" class="border p-2">
+            <input type="text" id="phone" placeholder="Driver Phone" class="border p-2">
+            <button type="button" onclick="createDriver()" class="bg-blue-500 text-white p-2">Create Driver</button>
+        </form>
+        <h2 class="text-xl mt-4">Create Booking</h2>
+        <form id="bookingForm" class="mb-4">
+            <input type="text" id="name" placeholder="Name" class="border p-2">
+            <input type="text" id="pickup_location" placeholder="Pickup Location" class="border p-2">
+            <input type="text" id="dropoff_location" placeholder="Dropoff Location" class="border p-2">
+            <input type="date" id="booking_date" class="border p-2">
+            <input type="time" id="booking_time" class="border p-2">
+            <select id="driver_id" class="border p-2"></select>
+            <button type="button" onclick="createBooking()" class="bg-blue-500 text-white p-2">Create Booking</button>
+        </form>
+        <div id="bookingsList" class="mt-4"></div>
+    </div>
+    <script>
+        async function createDriver() {
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+
+            const response = await fetch('/drivers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, phone })
+            });
+
+            if (response.ok) {
+                alert('Driver created successfully!');
+                document.getElementById('driverForm').reset();
+            } else {
+                alert('Error creating driver');
+            }
+        }
+
+        async function createBooking() {
+            const name = document.getElementById('name').value;
+            const pickup_location = document.getElementById('pickup_location').value;
+            const dropoff_location = document.getElementById('dropoff_location').value;
+            const booking_date = document.getElementById('booking_date').value;
+            const booking_time = document.getElementById('booking_time').value;
+            const driver_id = document.getElementById('driver_id').value;
+
+            const response = await fetch('/bookings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, pickup_location, dropoff_location, booking_date, booking_time, driver_id })
+            });
+
+            if (response.ok) {
+                alert('Booking created successfully!');
+                document.getElementById('bookingForm').reset();
+            } else {
+                alert('Error creating booking');
+            }
+        }
+
+        async function loadDrivers() {
+            const response = await fetch('/drivers');
+            const drivers = await response.json();
+            const driverSelect = document.getElementById('driver_id');
+            driverSelect.innerHTML = '';
+            drivers.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver.id;
+                option.textContent = driver.name;
+                driverSelect.appendChild(option);
+            });
+        }
+
+        async function loadBookings() {
+            const response = await fetch('/bookings');
+            const bookings = await response.json();
+            const bookingsList = document.getElementById('bookingsList');
+            bookingsList.innerHTML = '';
+            bookings.forEach(booking => {
+                const bookingItem = document.createElement('div');
+                bookingItem.textContent = `Name: ${booking.name}, Pickup: ${booking.pickup_location}, Dropoff: ${booking.dropoff_location}, Driver: ${booking.driver_name}`;
+                bookingsList.appendChild(bookingItem);
+            });
+        }
+
+        loadDrivers();
+        loadBookings();
+    </script>
+</body>
+</html>
